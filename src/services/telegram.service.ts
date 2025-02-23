@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Telegraf } from 'telegraf';
 import { telegrafProviderKey } from '../keys';
 
-export const chatList = new Set<string>(['-1002432753133']);
+export const chatList = new Set<string>(['-1002432753133', '-1002431220973']);
 
 export const data = {
   temperature: 'null',
