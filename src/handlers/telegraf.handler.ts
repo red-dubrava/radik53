@@ -1,8 +1,8 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { Markup, Telegraf } from 'telegraf';
+import { Context, Markup, Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import { telegrafProviderKey, appOptionsProviderKey } from '../keys';
-import { chatList, GoogleSheetsService, TelegramService } from '@radik53/services';
+import { GoogleSheetsService, TelegramService } from '@radik53/services';
 
 export interface TelegrafHandlerOptions {
   accountingSpreadsheetId: string;
@@ -56,7 +56,6 @@ export class TelegrafHandler implements OnModuleInit {
       const botId = botInfo?.id;
 
       if (message.new_chat_members.some((member) => member.id === botId)) {
-        chatList.add(chat.id.toString());
         console.log(`Бот добавлен в чат: ${chat.id}`);
       }
     });
@@ -64,7 +63,6 @@ export class TelegrafHandler implements OnModuleInit {
     this.#telegraf.on(message('left_chat_member'), (ctx) => {
       const { botInfo, message, chat } = ctx;
       if (message.left_chat_member.id === botInfo?.id) {
-        chatList.delete(chat.id.toString());
         console.log(`Бот удалён из чата: ${chat.id}`);
       }
     });
@@ -117,6 +115,7 @@ export class TelegrafHandler implements OnModuleInit {
     });
 
     this.#telegraf.action(['expenses'], async (ctx) => {
+      if (!(await this.isChatMember(ctx))) return;
       const { first_name } = ctx.from;
       const message = await this.#createExpensesMessage();
       await ctx.answerCbQuery();
@@ -124,6 +123,7 @@ export class TelegrafHandler implements OnModuleInit {
     });
 
     this.#telegraf.action(['income'], async (ctx) => {
+      if (!(await this.isChatMember(ctx))) return;
       const { first_name } = ctx.from;
       const message = await this.#createIncomeMassage();
       await ctx.answerCbQuery();
@@ -131,6 +131,7 @@ export class TelegrafHandler implements OnModuleInit {
     });
 
     this.#telegraf.action([/investment (.+)?/], async (ctx) => {
+      if (!(await this.isChatMember(ctx))) return;
       if (!('data' in ctx.callbackQuery) || typeof ctx.callbackQuery.data !== 'string') return;
       const { first_name } = ctx.from;
       const message = await this.#createInvestmentMessage(ctx.callbackQuery.data);
@@ -139,6 +140,7 @@ export class TelegrafHandler implements OnModuleInit {
     });
 
     this.#telegraf.action(['profit'], async (ctx) => {
+      if (!(await this.isChatMember(ctx))) return;
       const { first_name } = ctx.from;
       const message = await this.#createProfitMassage();
       await ctx.answerCbQuery();
@@ -146,6 +148,7 @@ export class TelegrafHandler implements OnModuleInit {
     });
 
     this.#telegraf.action(['fund'], async (ctx) => {
+      if (!(await this.isChatMember(ctx))) return;
       const { first_name } = ctx.from;
       const message = await this.#createFundMassage();
       await ctx.answerCbQuery();
@@ -153,6 +156,18 @@ export class TelegrafHandler implements OnModuleInit {
     });
 
     void this.#telegraf.launch();
+  }
+
+  async isChatMember(ctx: Context): Promise<boolean> {
+    const chatId = ctx.chat?.id;
+    const botId = ctx.botInfo?.id;
+    if (!chatId || !botId) return false;
+    try {
+      await ctx.telegram.getChatMember(chatId, botId);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async #createInvestmentMessage(text = ''): Promise<string> {
