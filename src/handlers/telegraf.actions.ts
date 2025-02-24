@@ -3,9 +3,6 @@ import { GoogleSheetsService } from '@radik53/services';
 import { capitalizeFirstLetter } from './utils';
 import { createExpensesMessage, createIncomeMessage, createInvestmentMessage, createProfitMessage, createFundMessage } from './telegraf.commands';
 
-/**
- * Обрабатывает нажатие кнопки "Общие затраты".
- */
 export async function handleActionExpenses(ctx: Context, googleSheetsService: GoogleSheetsService, accountingSpreadsheetId: string) {
   if (!(await isChatMember(ctx))) return; // Проверяем, является ли бот участником чата
 
