@@ -104,7 +104,7 @@ export class TelegrafHandler implements OnModuleInit {
         Markup.inlineKeyboard([
           [Markup.button.callback('Общий доход (income)', 'income')],
           [Markup.button.callback('Общие затраты (expenses)', 'expenses')],
-          [Markup.button.callback('Общие вложения (investment)', 'investment')],
+          [Markup.button.callback('Общие вложения (investment)', 'investment ')],
           [Markup.button.callback('Вложение "Саша" (investment Саша)', 'investment Саша')],
           [Markup.button.callback('Вложение "Миша" (investment Миша)', 'investment Миша')],
           [Markup.button.callback('Вложение "Сергей" (investment Сергей)', 'investment Сергей')],
