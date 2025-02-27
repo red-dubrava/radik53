@@ -5,7 +5,8 @@ import { google } from 'googleapis';
 import type { GoogleAuth } from 'googleapis-common';
 
 import { AppConfig, AppOptions } from './types';
-import { appOptionsProviderKey, googleProviderKey, telegrafProviderKey } from './keys';
+import { appOptionsProviderKey, googleProviderKey, telegrafProviderKey, telegrafSheetsProviderKey } from './keys';
+import { SheetsQueryService } from './services';
 
 export type AppConfigService = ConfigService<AppConfig, true>;
 
@@ -36,4 +37,9 @@ export const googleProvider: Provider = {
     });
   },
   inject: [ConfigService],
+} satisfies Provider;
+
+export const sheetsQueryProvider: Provider = {
+  provide: telegrafSheetsProviderKey,
+  useClass: SheetsQueryService,
 } satisfies Provider;

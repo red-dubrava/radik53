@@ -4,8 +4,8 @@ import { GoogleSheetsService, TelegramService } from './services';
 import { ConfigModule } from '@nestjs/config';
 import { validateConfig } from './helpers';
 import { AppConfig } from './types';
-import { appOptionsProvider, googleProvider, telegrafProvider } from './providers';
-import { TelegrafHandler } from './handlers';
+import { appOptionsProvider, googleProvider, sheetsQueryProvider, telegrafProvider } from './providers';
+import { TelegrafActionsHandler, TelegrafCommandsHandler, TelegrafEventsHandler } from './handlers';
 
 const processVars = ['TELEGRAM_BOT_TOKEN', 'GOOGLE_CREDENTIALS_FILEPATH', 'ACCOUNTING_SPREADSHEET_ID'] satisfies (keyof AppConfig)[];
 
@@ -16,6 +16,16 @@ const processVars = ['TELEGRAM_BOT_TOKEN', 'GOOGLE_CREDENTIALS_FILEPATH', 'ACCOU
     }),
   ],
   controllers: [StatsController],
-  providers: [TelegramService, TelegrafHandler, GoogleSheetsService, appOptionsProvider, telegrafProvider, googleProvider],
+  providers: [
+    TelegramService,
+    GoogleSheetsService,
+    TelegrafEventsHandler,
+    TelegrafCommandsHandler,
+    TelegrafActionsHandler,
+    appOptionsProvider,
+    telegrafProvider,
+    googleProvider,
+    sheetsQueryProvider,
+  ],
 })
 export class AppModule {}
