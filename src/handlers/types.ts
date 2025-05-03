@@ -5,3 +5,8 @@ export interface TelegrafSheetsService {
   createProfitMessage(): Promise<string>;
   createFundMessage(): Promise<string>;
 }
+
+export interface MiningPoolMessageService {
+  getBalanceMessage(): Promise<string>;
+  getHashrateMessage(): Promise<string>;
+}

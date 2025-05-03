@@ -8,10 +8,12 @@ const SHEET_NAME = 'Лист1';
 
 const INVESTMENT_COLUMN = 'G';
 const EXPENSES_COLUMN = 'N';
-const INCOME_COLUMN = 'Q';
+const INCOME_COLUMN = 'R';
 
 const FUND_CELL = 'C3';
 const PROFIT_CELL = 'C4';
+
+const TOTAL_ROW = '32'; // TODO: получать динамически
 
 export interface TelegrafHelperServiceOptions {
   accountingSpreadsheetId: string;
@@ -37,7 +39,7 @@ export class SheetsQueryService implements TelegrafSheetsService {
   async createExpensesMessage(): Promise<string> {
     const { accountingSpreadsheetId } = this.#options;
     const column = EXPENSES_COLUMN;
-    const row = '31'; // TODO: получать динамически
+    const row = TOTAL_ROW;
     try {
       const values = await this.#googleSheetsService.getData(accountingSpreadsheetId, `${SHEET_NAME}!${column + row}`);
       const [expenses] = values.flat();
@@ -51,7 +53,7 @@ export class SheetsQueryService implements TelegrafSheetsService {
   async createIncomeMessage(): Promise<string> {
     const { accountingSpreadsheetId } = this.#options;
     const column = INCOME_COLUMN;
-    const row = '31'; // TODO: получать динамически
+    const row = TOTAL_ROW;
     const range = `${SHEET_NAME}!${column + row}`;
     try {
       const values = await this.#googleSheetsService.getData(accountingSpreadsheetId, range);
@@ -67,7 +69,7 @@ export class SheetsQueryService implements TelegrafSheetsService {
     const { accountingSpreadsheetId } = this.#options;
     const name = text.split(' ').slice(1).join(' ');
     const column = columnsMap.get(name) ?? INVESTMENT_COLUMN;
-    const row = '31'; // TODO: получать динамически
+    const row = TOTAL_ROW;
     const range = `${SHEET_NAME}!${column + row}`;
     try {
       const values = await this.#googleSheetsService.getData(accountingSpreadsheetId, range);
