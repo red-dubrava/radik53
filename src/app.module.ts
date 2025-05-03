@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { StatsController } from './controllers';
-import { GoogleSheetsService, TelegramService } from './services';
+import { EmcdService, GoogleSheetsService, TelegramService, WorkerService } from './services';
 import { ConfigModule } from '@nestjs/config';
 import { validateConfig } from './helpers';
 import { AppConfig } from './types';
-import { appOptionsProvider, googleProvider, sheetsQueryProvider, telegrafProvider } from './providers';
+import { appOptionsProvider, miningPoolMessageServiceProvider, googleProvider, sheetsQueryServiceProvider, telegrafProvider } from './providers';
 import { TelegrafActionsHandler, TelegrafCommandsHandler, TelegrafEventsHandler } from './handlers';
 
-const processVars = ['TELEGRAM_BOT_TOKEN', 'GOOGLE_CREDENTIALS_FILEPATH', 'ACCOUNTING_SPREADSHEET_ID'] satisfies (keyof AppConfig)[];
+const processVars = ['TELEGRAM_BOT_TOKEN', 'GOOGLE_CREDENTIALS_FILEPATH', 'ACCOUNTING_SPREADSHEET_ID', 'EMCD_KEY'] satisfies (keyof AppConfig)[];
 
 @Module({
   imports: [
@@ -19,13 +19,16 @@ const processVars = ['TELEGRAM_BOT_TOKEN', 'GOOGLE_CREDENTIALS_FILEPATH', 'ACCOU
   providers: [
     TelegramService,
     GoogleSheetsService,
+    EmcdService,
+    WorkerService,
     TelegrafEventsHandler,
     TelegrafCommandsHandler,
     TelegrafActionsHandler,
     appOptionsProvider,
     telegrafProvider,
     googleProvider,
-    sheetsQueryProvider,
+    sheetsQueryServiceProvider,
+    miningPoolMessageServiceProvider,
   ],
 })
 export class AppModule {}

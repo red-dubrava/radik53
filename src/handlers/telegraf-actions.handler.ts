@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { telegrafSheetsProviderKey, telegrafProviderKey } from '../keys';
+import { telegrafSheetsProviderKey, telegrafProviderKey, miningPoolMessageServiceProviderKey } from '../keys';
 import { Context, Telegraf } from 'telegraf';
-import { TelegrafSheetsService } from './types';
+import { MiningPoolMessageService, TelegrafSheetsService } from './types';
 
 const capitalizeFirstLetter = (str: string) => {
   if (str.length === 0) return str;
@@ -14,9 +14,16 @@ export class TelegrafActionsHandler {
 
   readonly #telegrafSheetsService: TelegrafSheetsService;
 
-  constructor(@Inject(telegrafProviderKey) telegraf: Telegraf, @Inject(telegrafSheetsProviderKey) telegrafSheetsService: TelegrafSheetsService) {
+  readonly #miningPoolMessageService: MiningPoolMessageService;
+
+  constructor(
+    @Inject(telegrafProviderKey) telegraf: Telegraf,
+    @Inject(telegrafSheetsProviderKey) telegrafSheetsService: TelegrafSheetsService,
+    @Inject(miningPoolMessageServiceProviderKey) miningPoolMessageService: MiningPoolMessageService,
+  ) {
     this.#telegraf = telegraf;
     this.#telegrafSheetsService = telegrafSheetsService;
+    this.#miningPoolMessageService = miningPoolMessageService;
   }
 
   onModuleInit(): void {
@@ -59,6 +66,22 @@ export class TelegrafActionsHandler {
       if (!(await this.#isChatMember(ctx))) return;
       const { first_name } = ctx.from;
       const message = await this.#telegrafSheetsService.createFundMessage();
+      await ctx.answerCbQuery();
+      await ctx.reply(`${first_name}, ${capitalizeFirstLetter(message)}`);
+    });
+
+    this.#telegraf.action(['balance'], async (ctx) => {
+      if (!(await this.#isChatMember(ctx))) return;
+      const { first_name } = ctx.from;
+      const message = await this.#miningPoolMessageService.getBalanceMessage();
+      await ctx.answerCbQuery();
+      await ctx.reply(`${first_name}, ${capitalizeFirstLetter(message)}`);
+    });
+
+    this.#telegraf.action(['hashrate'], async (ctx) => {
+      if (!(await this.#isChatMember(ctx))) return;
+      const { first_name } = ctx.from;
+      const message = await this.#miningPoolMessageService.getHashrateMessage();
       await ctx.answerCbQuery();
       await ctx.reply(`${first_name}, ${capitalizeFirstLetter(message)}`);
     });

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { TelegramService } from '@radik53/services';
-import { telegrafSheetsProviderKey, telegrafProviderKey } from '../keys';
+import { telegrafSheetsProviderKey, telegrafProviderKey, miningPoolMessageServiceProviderKey } from '../keys';
 import { Markup, Telegraf } from 'telegraf';
-import { TelegrafSheetsService } from './types';
+import { MiningPoolMessageService, TelegrafSheetsService } from './types';
 
 @Injectable()
 export class TelegrafCommandsHandler {
@@ -12,14 +12,18 @@ export class TelegrafCommandsHandler {
 
   readonly #telegrafSheetsService: TelegrafSheetsService;
 
+  readonly #miningPoolMessageService: MiningPoolMessageService;
+
   constructor(
+    telegramService: TelegramService,
     @Inject(telegrafProviderKey) telegraf: Telegraf,
     @Inject(telegrafSheetsProviderKey) telegrafSheetsService: TelegrafSheetsService,
-    telegramService: TelegramService,
+    @Inject(miningPoolMessageServiceProviderKey) miningPoolMessageService: MiningPoolMessageService,
   ) {
     this.#telegraf = telegraf;
     this.#telegramService = telegramService;
     this.#telegrafSheetsService = telegrafSheetsService;
+    this.#miningPoolMessageService = miningPoolMessageService;
   }
 
   onModuleInit(): void {
@@ -55,6 +59,22 @@ export class TelegrafCommandsHandler {
       }
     });
 
+    this.#telegraf.command(['balance'], async (ctx) => {
+      const chatId = ctx.chat?.id;
+      if (chatId) {
+        const message = await this.#miningPoolMessageService.getBalanceMessage();
+        await ctx.reply(message);
+      }
+    });
+
+    this.#telegraf.command(['hashrate'], async (ctx) => {
+      const chatId = ctx.chat?.id;
+      if (chatId) {
+        const message = await this.#miningPoolMessageService.getHashrateMessage();
+        await ctx.reply(message);
+      }
+    });
+
     this.#telegraf.command(['help', 'h'], async (ctx) => {
       await ctx.reply(
         'Доступные команды:',
@@ -67,6 +87,8 @@ export class TelegrafCommandsHandler {
           [Markup.button.callback('Вложение "Сергей" (investment Сергей)', 'investment Сергей')],
           [Markup.button.callback('Прибыль (profit)', 'profit')],
           [Markup.button.callback('Фонд (fund)', 'fund')],
+          [Markup.button.callback('Баланс на майнинг пуле (balance)', 'balance')],
+          [Markup.button.callback('Хэшрейт на майнинг пуле (hashrate)', 'hashrate')],
         ]),
       );
     });

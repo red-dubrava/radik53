@@ -5,8 +5,15 @@ import { google } from 'googleapis';
 import type { GoogleAuth } from 'googleapis-common';
 
 import { AppConfig, AppOptions } from './types';
-import { appOptionsProviderKey, googleProviderKey, telegrafProviderKey, telegrafSheetsProviderKey } from './keys';
+import {
+  appOptionsProviderKey,
+  miningPoolMessageServiceProviderKey,
+  googleProviderKey,
+  telegrafProviderKey,
+  telegrafSheetsProviderKey,
+} from './keys';
 import { SheetsQueryService } from './services';
+import { EmcdMessageService } from './services/emcd-message.service';
 
 export type AppConfigService = ConfigService<AppConfig, true>;
 
@@ -15,6 +22,7 @@ export const appOptionsProvider: Provider = {
   useFactory: (configService: AppConfigService): AppOptions => {
     return {
       accountingSpreadsheetId: configService.get('ACCOUNTING_SPREADSHEET_ID'),
+      emcdKey: configService.get('EMCD_KEY'),
     };
   },
   inject: [ConfigService],
@@ -39,7 +47,12 @@ export const googleProvider: Provider = {
   inject: [ConfigService],
 } satisfies Provider;
 
-export const sheetsQueryProvider: Provider = {
+export const sheetsQueryServiceProvider: Provider = {
   provide: telegrafSheetsProviderKey,
   useClass: SheetsQueryService,
+} satisfies Provider;
+
+export const miningPoolMessageServiceProvider: Provider = {
+  provide: miningPoolMessageServiceProviderKey,
+  useClass: EmcdMessageService,
 } satisfies Provider;
