@@ -23,6 +23,7 @@ export const appOptionsProvider: Provider = {
     return {
       accountingSpreadsheetId: configService.get('ACCOUNTING_SPREADSHEET_ID'),
       emcdKey: configService.get('EMCD_KEY'),
+      hashrateChangeThreshold: +configService.get('HASHRATE_CHANGE_THRESHOLD'),
     };
   },
   inject: [ConfigService],

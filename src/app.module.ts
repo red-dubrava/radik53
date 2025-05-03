@@ -7,7 +7,13 @@ import { AppConfig } from './types';
 import { appOptionsProvider, miningPoolMessageServiceProvider, googleProvider, sheetsQueryServiceProvider, telegrafProvider } from './providers';
 import { TelegrafActionsHandler, TelegrafCommandsHandler, TelegrafEventsHandler } from './handlers';
 
-const processVars = ['TELEGRAM_BOT_TOKEN', 'GOOGLE_CREDENTIALS_FILEPATH', 'ACCOUNTING_SPREADSHEET_ID', 'EMCD_KEY'] satisfies (keyof AppConfig)[];
+const processVars = [
+  'TELEGRAM_BOT_TOKEN',
+  'GOOGLE_CREDENTIALS_FILEPATH',
+  'ACCOUNTING_SPREADSHEET_ID',
+  'EMCD_KEY',
+  'HASHRATE_CHANGE_THRESHOLD',
+] satisfies (keyof AppConfig)[];
 
 @Module({
   imports: [
