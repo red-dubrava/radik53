@@ -5,19 +5,21 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
 import { Telegraf } from 'telegraf';
 
-import { telegrafProviderKey } from '../keys';
+import { appOptionsProviderKey, telegrafProviderKey } from '../keys';
 import { EmcdService } from './emcd.service';
 import { message } from 'telegraf/filters';
 import { toTH } from 'src/utils';
 
 const CHECK_INTERVAL = 5 * 60 * 1_000;
 
-const HASHRATE_CHANGE_THRESHOLD = 10;
-
 interface WorkerServiceStore {
   activeWorkers: number;
   currentHashrate: number;
   chats: number[];
+}
+
+export interface WorkerServiceOptions {
+  hashrateChangeThreshold: number;
 }
 
 const dataPath = path.resolve(__dirname, '../../data/worker-store.json');
@@ -28,15 +30,24 @@ export class WorkerService implements OnModuleInit {
 
   readonly #telegraf: Telegraf;
 
+  readonly #options: WorkerServiceOptions;
+
   readonly #store = {
     activeWorkers: 0,
     currentHashrate: 0,
     chats: new Set<number>(),
   };
 
-  constructor(emcdService: EmcdService, @Inject(telegrafProviderKey) telegraf: Telegraf) {
+  constructor(
+    emcdService: EmcdService,
+    @Inject(appOptionsProviderKey) options: WorkerServiceOptions,
+    @Inject(telegrafProviderKey) telegraf: Telegraf,
+  ) {
     this.#emcdService = emcdService;
     this.#telegraf = telegraf;
+    this.#options = {
+      hashrateChangeThreshold: options.hashrateChangeThreshold,
+    };
   }
 
   async onModuleInit() {
@@ -89,10 +100,11 @@ export class WorkerService implements OnModuleInit {
 
   async #checkHashrate({ hashrate }: { hashrate: number }) {
     const { currentHashrate } = this.#store;
+    const { hashrateChangeThreshold } = this.#options;
 
     const changePercent = Math.min(100, Math.abs((hashrate - currentHashrate) / currentHashrate) * 100);
 
-    if (changePercent < HASHRATE_CHANGE_THRESHOLD) return;
+    if (changePercent < hashrateChangeThreshold) return;
 
     const prev = toTH(currentHashrate);
     const curr = toTH(hashrate);
