@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { appOptionsProviderKey } from '../keys';
 import { join } from 'node:path';
+import { HttpService } from './http.service';
 
 export interface EmcdServiceOptions {
   readonly emcdKey: string;
@@ -10,7 +11,9 @@ export interface IUserData {
   readonly username: string;
   readonly coins: {
     readonly btc: {
-      readonly balance: number;
+      readonly coin_id: string;
+      readonly total_paid: number;
+      readonly total_reward: number;
     };
   };
 }
@@ -30,29 +33,27 @@ export class EmcdService {
 
   readonly #url = 'https://api.emcd.io';
 
-  constructor(@Inject(appOptionsProviderKey) options: EmcdServiceOptions) {
+  readonly #httpService: HttpService;
+
+  constructor(@Inject(appOptionsProviderKey) options: EmcdServiceOptions, httpService: HttpService) {
     this.#key = options.emcdKey;
+    this.#httpService = httpService;
   }
 
   async getUserData(): Promise<IUserData> {
-    const response = await this.#request('v2/info');
-    return (await response.json()) as IUserData;
+    return (await this.#request('v2/info')) as IUserData;
   }
 
   async getWorkers(): Promise<IWorkersData> {
-    const response = await this.#request('v1/btc/workers');
-    return (await response.json()) as IWorkersData;
+    return (await this.#request('v1/btc/workers')) as IWorkersData;
   }
 
-  async #request(endpoint: string): Promise<Response> {
-    const url = join(this.#url, endpoint, this.#key);
-    const response = await fetch(url, { method: 'GET' });
-
-    if (!response.ok) {
-      const message = await response.text();
-      throw new Error(`EMCD API error: ${message}`);
+  async #request(endpoint: string): Promise<unknown> {
+    try {
+      const url = join(this.#url, endpoint, this.#key);
+      return this.#httpService.getJson(url);
+    } catch (error) {
+      throw new Error(`EMCD API error`, { cause: error });
     }
-
-    return response;
   }
 }

@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { StatsController } from './controllers';
-import { EmcdService, GoogleSheetsService, TelegramService, WorkerService } from './services';
+import { EmcdService, GoogleSheetsService, HttpService, TelegramService, WorkerService } from './services';
 import { ConfigModule } from '@nestjs/config';
 import { validateConfig } from './helpers';
 import { AppConfig } from './types';
 import { appOptionsProvider, miningPoolMessageServiceProvider, googleProvider, sheetsQueryServiceProvider, telegrafProvider } from './providers';
 import { TelegrafActionsHandler, TelegrafCommandsHandler, TelegrafEventsHandler } from './handlers';
+import { MinerService } from './services/miner.service';
 
 const processVars = [
   'TELEGRAM_BOT_TOKEN',
@@ -13,6 +14,7 @@ const processVars = [
   'ACCOUNTING_SPREADSHEET_ID',
   'EMCD_KEY',
   'HASHRATE_CHANGE_THRESHOLD',
+  'MINER_IP',
 ] satisfies (keyof AppConfig)[];
 
 @Module({
@@ -25,6 +27,8 @@ const processVars = [
   providers: [
     TelegramService,
     GoogleSheetsService,
+    HttpService,
+    MinerService,
     EmcdService,
     WorkerService,
     TelegrafEventsHandler,
