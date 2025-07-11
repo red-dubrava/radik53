@@ -24,6 +24,7 @@ export const appOptionsProvider: Provider = {
       accountingSpreadsheetId: configService.get('ACCOUNTING_SPREADSHEET_ID'),
       emcdKey: configService.get('EMCD_KEY'),
       hashrateChangeThreshold: +configService.get('HASHRATE_CHANGE_THRESHOLD'),
+      minerIp: configService.get('MINER_IP'),
     };
   },
   inject: [ConfigService],

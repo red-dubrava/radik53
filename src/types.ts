@@ -4,10 +4,12 @@ export interface AppConfig {
   ACCOUNTING_SPREADSHEET_ID: string;
   EMCD_KEY: string;
   HASHRATE_CHANGE_THRESHOLD: string;
+  MINER_IP: string;
 }
 
 export interface AppOptions {
   accountingSpreadsheetId: string;
   emcdKey: string;
   hashrateChangeThreshold: number;
+  minerIp: string;
 }

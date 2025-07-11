@@ -13,7 +13,7 @@ const INCOME_COLUMN = 'R';
 const FUND_CELL = 'C3';
 const PROFIT_CELL = 'C4';
 
-const TOTAL_ROW = '32'; // TODO: получать динамически
+const TOTAL_ROW = '60'; // TODO: получать динамически
 
 export interface TelegrafHelperServiceOptions {
   accountingSpreadsheetId: string;

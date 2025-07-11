@@ -92,7 +92,5 @@ export class TelegrafCommandsHandler {
         ]),
       );
     });
-
-    void this.#telegraf.launch();
   }
 }

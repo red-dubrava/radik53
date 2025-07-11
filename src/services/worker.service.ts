@@ -102,6 +102,8 @@ export class WorkerService implements OnModuleInit {
     const { currentHashrate } = this.#store;
     const { hashrateChangeThreshold } = this.#options;
 
+    if (currentHashrate === hashrate) return;
+
     const changePercent = Math.min(100, Math.abs((hashrate - currentHashrate) / currentHashrate) * 100);
 
     if (changePercent < hashrateChangeThreshold) return;
