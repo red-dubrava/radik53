@@ -6,9 +6,9 @@ import { appOptionsProviderKey } from '../keys';
 
 const SHEET_NAME = 'Лист1';
 
-const INVESTMENT_COLUMN = 'G';
-const EXPENSES_COLUMN = 'N';
-const INCOME_COLUMN = 'R';
+const INVESTMENT_COLUMN = 'F';
+const EXPENSES_COLUMN = 'M';
+const INCOME_COLUMN = 'Q';
 
 const FUND_CELL = 'C3';
 const PROFIT_CELL = 'C4';
